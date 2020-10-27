@@ -5,7 +5,7 @@
 
 using namespace std;
 void displayScore(int sticks);
-int gatherPlayerInput(int score);
+int gatherPlayerInput();
 bool isGameOver(int score);
 bool playAgain();
 
@@ -14,49 +14,69 @@ int main() {
     do {
         // Greet players and initiate game.
         std::cout << "Welcome to Nim!" << std::endl;
-        std::cout << "Players will take turns removing 1, 2, or 3 sticks from the initial 11.\nThe player removing the"
-                     "last stick wins!" << std::endl;
+        std::cout << "Players will take turns removing 1, 2, or 3 sticks from the initial 11." << std::endl;
+        std::cout <<  "The player removing the last stick wins!" << std::endl;
         bool gameOn;
-        int player;
+        int player = 1;
+        int score = 11;
         do {
-            int player = 1;
-            int score = 11;
+
             int turnInput;
             std::cout << "The game currently looks like this:" << std::endl;
             displayScore(score);
             std:: cout << "Player " << player << ", it\'s your turn!" << std:: endl;
             std::cout << "How many sticks would you like to remove?" << std:: endl;
-            turnInput = gatherPlayerInput(score);
+            turnInput = gatherPlayerInput();
+            std::cout << "Player " << player << " takes " << turnInput << "sticks!" << std::endl;
             score = score - turnInput;
-            bool gameOn = isGameOver(score);
-        }
-        while (gameOn);
-        std:: cout << "Player " << player << "is the winner!" std::endl;
+            if (isGameOver(score)) {
+                gameOn = false;
+            }
+            else {
+                gameOn = true;
+                if(player == 1 ) {
+                    player = 2;
+                }
+                else {
+                    player = 1;
+                }
+            }
+        } while (gameOn);
+
+        std:: cout << "Player " << player << " is the winner!" << std::endl;
         std:: cout << "Congratulations" << std::endl;
         playing = playAgain();
     }
     while (playing);
 
-    std::cout << "Thank you for playing Nim!" << std:: endl;
+    std::cout << "Thank you for playing Nim!" << std::endl;
     return 0;
+}
+
+bool isGameOver(int score) {
+    return score <= 0;
 }
 
 void displayScore(int sticks) {
     for( int i = 0; i < sticks; i++ ) {
         std::cout << "|";
     }
+    std::cout << endl;
 }
 
-int gatherPlayerInput(int score) {
+int gatherPlayerInput() {
     const int LARGE = numeric_limits<streamsize>::max();
     const char END_LINE = '\n';
     int input;
     do {
         std::cin >> input;
         if ( input < 1 || input > 3 ) {
-            std::cout << "Only values 1-3 are accepted" <<
+            std::cout << "Only values 1-3 are accepted" << endl;
+            cin.clear();
+            cin.ignore(LARGE,END_LINE);
         }
-    }
+    } while( input < 1 || input > 3 );
+    return input;
 }
 
 bool playAgain(){
