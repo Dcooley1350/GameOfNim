@@ -4,6 +4,7 @@
 #include <cctype>
 
 using namespace std;
+
 void displayScore(int sticks);
 int gatherPlayerInput();
 bool isGameOver(int score);
@@ -20,20 +21,25 @@ int main() {
         int player = 1;
         int score = 11;
         do {
-
             int turnInput;
+            // Display game board to user
             std::cout << "The game currently looks like this:" << std::endl;
             displayScore(score);
+            //Prompt for user input
             std:: cout << "Player " << player << ", it\'s your turn!" << std:: endl;
             std::cout << "How many sticks would you like to remove?" << std:: endl;
             turnInput = gatherPlayerInput();
+            //Give player feedback on play
             std::cout << "Player " << player << " takes " << turnInput << "sticks!" << std::endl;
+            //Acc score
             score = score - turnInput;
+            //Check for endgame condition
             if (isGameOver(score)) {
                 gameOn = false;
             }
             else {
                 gameOn = true;
+                //Switch players
                 if(player == 1 ) {
                     player = 2;
                 }
@@ -42,13 +48,14 @@ int main() {
                 }
             }
         } while (gameOn);
-
+        //End game and notify players
         std:: cout << "Player " << player << " is the winner!" << std::endl;
         std:: cout << "Congratulations" << std::endl;
+        // Ask players to play again
         playing = playAgain();
-    }
-    while (playing);
+    } while (playing);
 
+    //Thank players and exit program
     std::cout << "Thank you for playing Nim!" << std::endl;
     return 0;
 }
