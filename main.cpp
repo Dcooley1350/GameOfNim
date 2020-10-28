@@ -6,11 +6,13 @@
 using namespace std;
 
 void displayScore(int sticks);
-int gatherPlayerInput();
+int gatherPlayerInput(int score);
 bool isGameOver(int score);
 bool playAgain();
+void resetStream();
 
 int main() {
+    bool toEnd = true;
     bool playing;
     do {
         // Greet players and initiate game.
@@ -26,33 +28,43 @@ int main() {
             std::cout << "The game currently looks like this:" << std::endl;
             displayScore(score);
             //Prompt for user input
-            std:: cout << "Player " << player << ", it\'s your turn!" << std:: endl;
-            std::cout << "How many sticks would you like to remove?" << std:: endl;
-            turnInput = gatherPlayerInput();
-            //Give player feedback on play
-            std::cout << "Player " << player << " takes " << turnInput << "sticks!" << std::endl;
-            //Acc score
-            score = score - turnInput;
-            //Check for endgame condition
-            if (isGameOver(score)) {
+            std:: cout << "Player " << player << ", it\'s your turn!" << std::endl;
+            turnInput = gatherPlayerInput(score);
+            //Exit game if -1 inputted
+            if ( turnInput == -1 ) {
                 gameOn = false;
+                toEnd = false;
+                playing = false;
+                std::cout << "-1 inputted, exiting game. :(" << std::endl;
             }
             else {
-                gameOn = true;
-                //Switch players
-                if(player == 1 ) {
-                    player = 2;
+                //Give player feedback on play
+                std::cout << "Player " << player << " takes " << turnInput << (turnInput == 1 ? " stick!" : " sticks!") << std::endl;
+                //Acc score
+                score = score - turnInput;
+                //Check for endgame condition
+                if (isGameOver(score)) {
+                    gameOn = false;
                 }
                 else {
-                    player = 1;
+                    gameOn = true;
+                    //Switch players
+                    if(player == 1 ) {
+                        player = 2;
+                    }
+                    else {
+                        player = 1;
+                    }
                 }
             }
         } while (gameOn);
-        //End game and notify players
-        std:: cout << "Player " << player << " is the winner!" << std::endl;
-        std:: cout << "Congratulations" << std::endl;
-        // Ask players to play again
-        playing = playAgain();
+        if (toEnd) {
+            //End game and notify players
+            std:: cout << "Player " << player << " is the winner!" << std::endl;
+            std:: cout << "Congratulations" << std::endl;
+            // Ask players to play again
+            playing = playAgain();
+        }
     } while (playing);
 
     //Thank players and exit program
@@ -71,25 +83,31 @@ void displayScore(int sticks) {
     std::cout << endl;
 }
 
-int gatherPlayerInput() {
-    const int LARGE = numeric_limits<streamsize>::max();
-    const char END_LINE = '\n';
+int gatherPlayerInput(int score) {
     int input;
+    bool inputValid;
     do {
+        std::cout << "How many sticks would you like to remove?" << std:: endl;
         std::cin >> input;
-        if ( input < 1 || input > 3 ) {
-            std::cout << "Only values 1-3 are accepted" << endl;
-            cin.clear();
-            cin.ignore(LARGE,END_LINE);
+        if ( cin.fail() || input < -1 || input > 3 || input == 0 ) {
+            std::cout << "Only values 1-3 are acceptable plays! Enter -1 to exit." << endl;
+            resetStream();
+            inputValid = false;
         }
-    } while( input < 1 || input > 3 );
+        else if ( input > score ) {
+            std::cout << "You can\'t take sticks that are not there!" << endl;
+            resetStream();
+            inputValid = false;
+        }
+        else {
+            inputValid = true;
+        }
+    } while( !inputValid );
     return input;
 }
 
 bool playAgain(){
-    const int LARGE = numeric_limits<streamsize>::max();
-    const char END_LINE = '\n';
-    char input;
+    unsigned char input;
     bool playAgain;
 
     std::cout << "Would you like to play again? (y/n)" << std::endl;
@@ -99,10 +117,7 @@ bool playAgain(){
         input = tolower(input);
         if( input != 'y' && input != 'n') {
             std::cout << "Enter y or n, or else." << std::endl;
-            // Clear input and errors
-            cin.clear();
-            // Flush the buffer
-            cin.ignore(LARGE,END_LINE);
+            resetStream();
         }
     } while ( input != 'y' && input != 'n' );
 
@@ -110,9 +125,18 @@ bool playAgain(){
     if ( input == 'y' ) {
         playAgain = true;
     }
-    else if ( input == 'n') {
+    else {
         playAgain = false;
     }
     return playAgain;
+}
+
+void resetStream() {
+    const long LARGE = numeric_limits<streamsize>::max();
+    const char END_LINE = '\n';
+    // Clear input and errors
+    cin.clear();
+    // Flush the buffer
+    cin.ignore(LARGE,END_LINE);
 }
 
